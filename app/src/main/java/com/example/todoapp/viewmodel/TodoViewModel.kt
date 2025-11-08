@@ -8,18 +8,37 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import com.example.todoapp.model.Todo
+
+enum class TodoFilter {
+    ALL,      // Semua
+    ACTIVE,   // Aktif
+    COMPLETED // Selesai
+}
+
 class TodoViewModel : ViewModel() {
     private val _todos = MutableStateFlow<List<Todo>>(emptyList())
     private val _searchQuery = MutableStateFlow("")
+    private val _currentFilter = MutableStateFlow(TodoFilter.ALL)
 
     val searchQuery: StateFlow<String> = _searchQuery
+    val currentFilter: StateFlow<TodoFilter> = _currentFilter
 
-    // Combine todos and search query to produce filtered results
-    val todos: StateFlow<List<Todo>> = combine(_todos, _searchQuery) { todosList, query ->
+    // Combine todos, search query, and filter to produce filtered results
+    val todos: StateFlow<List<Todo>> = combine(_todos, _searchQuery, _currentFilter) { todosList, query, filter ->
+        var filteredList = todosList
+
+        // Apply filter based on completion status
+        filteredList = when (filter) {
+            TodoFilter.ALL -> filteredList
+            TodoFilter.ACTIVE -> filteredList.filter { !it.isDone }
+            TodoFilter.COMPLETED -> filteredList.filter { it.isDone }
+        }
+
+        // Apply search query
         if (query.isBlank()) {
-            todosList
+            filteredList
         } else {
-            todosList.filter { todo ->
+            filteredList.filter { todo ->
                 todo.title.contains(query, ignoreCase = true)
             }
         }
@@ -45,5 +64,9 @@ class TodoViewModel : ViewModel() {
 
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
+    }
+
+    fun setFilter(filter: TodoFilter) {
+        _currentFilter.value = filter
     }
 }
