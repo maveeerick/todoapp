@@ -5,21 +5,40 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.todoapp.viewmodel.TodoViewModel
+import com.example.todoapp.model.Todo
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.*
+
+
 @Composable
 fun TodoScreen(vm: TodoViewModel = viewModel()) {
+
+    // Collect state dari ViewModel
     val todos by vm.todos.collectAsState()
+
+    // Text untuk input tugas
     var text by rememberSaveable { mutableStateOf("") }
-    Column(Modifier.padding(16.dp)) {
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+
+        // TextField untuk input tugas
         OutlinedTextField(
             value = text,
             onValueChange = { text = it },
             label = { Text("Tambah tugas...") },
             modifier = Modifier.fillMaxWidth()
         )
+
+        // Tombol tambah
         Button(
             onClick = {
                 if (text.isNotBlank()) {
@@ -27,9 +46,15 @@ fun TodoScreen(vm: TodoViewModel = viewModel()) {
                     text = ""
                 }
             },
-            modifier = Modifier.padding(vertical = 8.dp)
-        ) { Text("Tambah") }
+            modifier = Modifier
+                .padding(vertical = 8.dp)
+        ) {
+            Text("Tambah")
+        }
+
         Divider()
+
+        // List Todo
         LazyColumn {
             items(todos) { todo ->
                 TodoItem(
