@@ -1,4 +1,7 @@
 package com.example.todoapp.model
 
-class Todo {
-}
+data class Todo(
+    val id: Int,
+    val title: String,
+    val isDone: Boolean = false
+)
