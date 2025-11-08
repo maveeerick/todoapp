@@ -20,6 +20,7 @@ fun TodoScreen(vm: TodoViewModel = viewModel()) {
 
     // Collect state dari ViewModel
     val todos by vm.todos.collectAsState()
+    val searchQuery by vm.searchQuery.collectAsState()
 
     // Text untuk input tugas
     var text by rememberSaveable { mutableStateOf("") }
@@ -29,6 +30,17 @@ fun TodoScreen(vm: TodoViewModel = viewModel()) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
+
+        // TextField untuk search
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { vm.updateSearchQuery(it) },
+            label = { Text("Cari tugas...") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         // TextField untuk input tugas
         OutlinedTextField(
