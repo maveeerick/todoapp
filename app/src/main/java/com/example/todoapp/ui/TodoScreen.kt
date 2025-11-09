@@ -24,6 +24,8 @@ fun TodoScreen(vm: TodoViewModel = viewModel()) {
     val todos by vm.todos.collectAsState()
     val searchQuery by vm.searchQuery.collectAsState()
     val currentFilter by vm.currentFilter.collectAsState()
+    val activeTodosCount by vm.activeTodosCount.collectAsState()
+    val completedTodosCount by vm.completedTodosCount.collectAsState()
 
     // Text untuk input tugas
     var text by rememberSaveable { mutableStateOf("") }
@@ -67,6 +69,17 @@ fun TodoScreen(vm: TodoViewModel = viewModel()) {
                 label = { Text("Selesai") },
                 modifier = Modifier.weight(1f)
             )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Counter untuk Tugas Aktif dan Selesai
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = "Aktif: $activeTodosCount")
+            Text(text = "Selesai: $completedTodosCount")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
