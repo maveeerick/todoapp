@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.map
 import com.example.todoapp.model.Todo
 
 enum class TodoFilter {
@@ -46,6 +47,22 @@ class TodoViewModel : ViewModel() {
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
+    )
+
+    val activeTodosCount: StateFlow<Int> = _todos.map { todos ->
+        todos.count { !it.isDone }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = 0
+    )
+
+    val completedTodosCount: StateFlow<Int> = _todos.map { todos ->
+        todos.count { it.isDone }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = 0
     )
 
     fun addTask(title: String) {
