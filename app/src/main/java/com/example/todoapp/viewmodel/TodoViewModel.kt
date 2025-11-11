@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.map
 import com.example.todoapp.model.Todo
+import kotlinx.coroutines.flow.asStateFlow
 
 enum class TodoFilter {
     ALL,      // Semua
@@ -20,7 +21,9 @@ class TodoViewModel : ViewModel() {
     private val _todos = MutableStateFlow<List<Todo>>(emptyList())
     private val _searchQuery = MutableStateFlow("")
     private val _currentFilter = MutableStateFlow(TodoFilter.ALL)
+    private val _scrollPosition = MutableStateFlow(0)
 
+    val scrollPosition = _scrollPosition.asStateFlow()
     val searchQuery: StateFlow<String> = _searchQuery
     val currentFilter: StateFlow<TodoFilter> = _currentFilter
 
@@ -85,5 +88,9 @@ class TodoViewModel : ViewModel() {
 
     fun setFilter(filter: TodoFilter) {
         _currentFilter.value = filter
+    }
+
+    fun saveScrollPosition(index: Int) {
+        _scrollPosition.value = index
     }
 }

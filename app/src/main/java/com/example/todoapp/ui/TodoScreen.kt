@@ -11,10 +11,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.todoapp.viewmodel.TodoViewModel
 import com.example.todoapp.viewmodel.TodoFilter
-import com.example.todoapp.model.Todo
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.lazy.rememberLazyListState
 
 
 @Composable
@@ -26,9 +24,18 @@ fun TodoScreen(vm: TodoViewModel = viewModel()) {
     val currentFilter by vm.currentFilter.collectAsState()
     val activeTodosCount by vm.activeTodosCount.collectAsState()
     val completedTodosCount by vm.completedTodosCount.collectAsState()
-
+    val savedScrollIndex by vm.scrollPosition.collectAsState()
+    val listState = rememberLazyListState(initialFirstVisibleItemIndex = savedScrollIndex)
     // Text untuk input tugas
     var text by rememberSaveable { mutableStateOf("") }
+
+
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.firstVisibleItemIndex }
+            .collect { index ->
+                vm.saveScrollPosition(index)
+            }
+    }
 
     Column(
         modifier = Modifier
@@ -109,7 +116,11 @@ fun TodoScreen(vm: TodoViewModel = viewModel()) {
         Divider()
 
         // List Todo
-        LazyColumn {
+        LazyColumn (
+            state = listState,
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ){
             items(todos) { todo ->
                 TodoItem(
                     todo = todo,
